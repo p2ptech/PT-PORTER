@@ -1,0 +1,30 @@
+#!/bin/bash
+
+{
+#get date timestamp
+NOW=$(date +%Y-%m-%d\ %H:%M:%S)
+LOGFILE=/var/log/autoseed_upload.log
+echo  "**********************************************************" >>${LOGFILE}  2>&1 
+
+echo  "${NOW}" >>${LOGFILE}  2>&1 
+
+echo  "1" >>${LOGFILE}  2>&1 
+
+echo *************************upload begin**************************;  >>${LOGFILE} 2>&1
+
+echo  "2" >>${LOGFILE}  2>&1 
+
+echo "${NOW}" >>${LOGFILE} 2>&1
+torrent_hash=$TR_TORRENT_HASH;
+
+echo  "The hash is \"$TR_TORRENT_HASH\"  now" >>${LOGFILE}  2>&1 
+
+
+
+/usr/bin/php   /var/www/nexusphp/bupt/uploaddb.php   $torrent_hash  >> ${LOGFILE} 2>&1 
+
+echo *************************upload end**************************;  >>${LOGFILE} 2>&1
+
+
+
+} &

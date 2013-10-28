@@ -1,0 +1,8 @@
+<?php 
+
+include_once('uploadFile.php');
+
+$torrent='test.torrent';
+echo uploadTorrent($torrent);
+
+?>

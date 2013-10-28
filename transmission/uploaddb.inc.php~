@@ -1,0 +1,164 @@
+<?php
+
+function uploadTorrent($torrent){
+
+
+/*********info neede for login ***********************/
+$username='vip';
+$password='vip123';
+$loginurl='http://222.199.184.41/takelogin.php';
+//$loginurl='http://222.199.184.28/takelogin.php';
+
+/*********info needed for upload**********************/
+//$uploadurl  = 'http://222.199.184.25/takeupload.php';
+$referurl='http://222.199.184.41/upload.php';
+$uploadurl  = 'http://222.199.184.41/takeupload_api.php';
+//$referurl='http://222.199.184.28/upload.php';
+//$uploadurl  = 'http://222.199.184.28/takeupload_api.php';
+
+
+
+//error_log("info for login",3,"/var/www/nexusphp/bupt/error_log");
+
+/*********dir for saving torrent when uploaded suceessfully******************/
+
+                            
+$dest_host="http://222.199.184.41/download2.php?id=";
+//$dest_host="http://222.199.184.28/download2.php?id=";
+
+$dest_passkey="&passkey=292f839cc1c4dcd3da580eb23963e105";
+//$dest_passkey="&passkey=b7014d5b1caeb7743fd2bfa4fb336e7e";
+//config target torrent save directory. path must be ended with '/';
+
+$dl_torrent_dir='/var/lib/transmission/transmission_watch/'; 
+
+
+//error_log("info for dir saving",3,"/var/www/nexusphp/bupt/error_log");
+
+
+
+/*************login *****************************/
+
+
+/*
+$login['username']=$username;
+$login['password']=$password;
+
+$cookie_jar = tempnam('./cookie','cookie'); 
+setcookie('c_lang_folder','chs');
+setcookie('c_secure_ssl','');
+$ch = curl_init(); 
+curl_setopt($ch, CURLOPT_URL, $loginurl); 
+curl_setopt($ch, CURLOPT_POST, 1); 
+//set post data 
+curl_setopt($ch, CURLOPT_POSTFIELDS, $login); 
+curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_jar); 
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+curl_setopt($ch, CURLOPT_HEADER, false); 
+curl_setopt($ch, CURLOPT_NOBODY, false); 
+curl_exec($ch); 
+curl_close($ch); 
+//get data after login 
+
+
+*/
+
+
+/*************upload torrent *****************************/ 
+
+//$cookie_jar = tempnam('./cookie','cookie'); 
+echo "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU</br>";
+echo "bbbbbbbbbbbbbbbbbbbbbbbbbb</br>";
+error_log("222",3,"/var/www/nexusphp/bupt1/error.log");
+$fields['file'] = '@'.$torrent['filename'];
+$fields['name'] = $torrent['name'];
+$fields['small_descr'] = $torrent['small_descr'];
+$fields['url'] = $torrent['imdb'];
+$fields['nfo'] = '';
+$fields['descr'] = $torrent['descr'];
+$fields['type'] = '401';
+$fields['medium_sel'] = '';
+$fields['codec_sel'] = '';
+$fields['standard_sel'] = '';
+$fields['audiocodec_sel'] = '';
+$fields['team_sel'] = '';
+$fields['doubanid'] = $torrents['doubanid'];
+$fields['passkey']='292f839cc1c4dcd3da580eb23963e105';
+//$fields['passkey']='b7014d5b1caeb7743fd2bfa4fb336e7e';
+echo $fields['doubanid'];
+echo "aaaaaaaaaaaaaaaaaaab</br>";
+error_log("222",3,"/var/www/nexusphp/bupt1/error.log");
+
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, $uploadurl);
+curl_setopt($ch, CURLOPT_POST, 1 );
+curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt ($ch, CURLOPT_REFERER, $referurl);
+//curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_jar);
+curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);//get redirect content
+curl_setopt($ch, CURLOPT_NOBODY, false);
+//error_log("next would exec  ",3,"/var/www/nexusphp/bupt/error_log");
+//curl_exec( $ch );
+$rs = curl_exec($ch);
+
+//error_log("go curl ",3,"/var/www/nexusphp/bupt/error_log");
+//error_log($rs,3,"/var/www/nexusphp/bupt/error_log");
+
+if ($error = curl_error($ch) ) {
+         //      error_log("curl error is ",3,"/var/www/nexusphp/bupt/error_log");
+        //    error_log($error,3,"/var/www/nexusphp/bupt/error_log");
+          die($error);
+           
+}
+
+echo "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP</br>";
+
+//error_log("PPPPPPPPPPPPPPPPPPPPPPP",3,"/var/www/nexusphp/bupt/error_log");
+
+$str=sprintf("%s",$rs);
+$strid=$str;
+curl_close($ch);
+//print_r(htmlspecialchars($rs));
+
+
+echo "\n";
+/*************redownload  torrent *****************************/ 
+echo "begin redownload torrent"."\n";
+echo $str."\n";
+
+//$pattern='/userdetails\.php\?id=[0-9]+/';
+$pattern='/download\.php\?id=[0-9]+/';
+$count = preg_match_all($pattern,$str,$id,PREG_SET_ORDER);
+if($count+0<=0)
+{
+	echo "no download url"."\n";
+}
+
+foreach ($id as  $item)
+{
+	echo $item[0]."\n";
+	$middle=$item[0];
+	echo "middle=".$middle."\n";
+}
+$host=$dest_host;
+$tail=$dest_passkey;
+$torrent_dir=$dl_torrent_dir;
+
+$newid=substr($strid,32);
+
+//error_log("new id is generated",3,"/var/www/nexusphp/bupt/error_log");
+
+include_once('curl.download.php');
+$torrent_url=$host.$newid.$tail;
+echo "</br>lalalalalaallaalal  ".$torrent_url."</br>";
+$fn=curlTool::downloadFile($torrent_url,$torrent_dir);
+echo "Grab file path =",$fn,"\n";
+//var_dump(CurlTool::$attach_info);
+print_r(CurlTool::$attach_info);
+
+return $fn;
+}
+?>
+

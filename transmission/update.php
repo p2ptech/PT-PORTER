@@ -1,0 +1,7 @@
+<?php
+echo "aa";
+
+//ini_set("include_path","/");
+require_once("../videoname1.php");
+echo "aa";
+?>

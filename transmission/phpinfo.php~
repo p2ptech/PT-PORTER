@@ -1,0 +1,6 @@
+<?php
+//echo phpinfo();
+$file=fopen("PTtorrents/wordtest.txt","w");
+echo fwrite($file,"hello man");
+fclose($file);
+?>
